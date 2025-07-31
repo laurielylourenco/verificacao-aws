@@ -43,7 +43,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "build/*" # A pasta que queremos copiar
-          target: "/home/ubuntu/verificacao-aws" 
+          target: "/home/${{ secrets.EC2_USERNAME }}/verificacao-aws"
 
       
       - name: Run final deploy script on EC2
@@ -54,4 +54,4 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sudo rm -rf /var/www/html/*
-            sudo mv /home/ubuntu/verificacao-aws/build/* /var/www/html/
+            sudo mv /home/${{ secrets.EC2_USERNAME }}/verificacao-aws/build/* /var/www/html/
