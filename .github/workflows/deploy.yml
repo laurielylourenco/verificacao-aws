@@ -42,7 +42,8 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "build/*" # A pasta que queremos copiar
+          script: echo "${{ secrets.MY_PUBLIC_KEY }}" >> ~/.ssh/authorized_keys
+          source: "build/*" 
           target: "/home/${{ secrets.EC2_USERNAME }}/verificacao-aws"
 
       
