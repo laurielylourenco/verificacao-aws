@@ -1,7 +1,6 @@
 
 name: Deploy Frontend to EC2
 
-
 on:
   push:
     branches: [ main ]
@@ -9,44 +8,50 @@ on:
 # Tarefas a serem executadas
 jobs:
   deploy:
-   
+
     runs-on: ubuntu-latest
 
     steps:
-      
+
       - name: Checkout code
         uses: actions/checkout@v3
 
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20' # Pode ajustar para a sua versão
+          node-version: '20' 
 
-      #  Instala as dependências do projeto
+      
       - name: Install dependencies
         run: npm install
 
-      # Cria o arquivo .env no servidor do GitHub usando o nosso segredo
+
       - name: Create .env file
         run: echo "REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}" > .env
 
-      #  Compila o projeto React para produção
+
       - name: Build project
         run: npm run build
 
-      # arquivos compilados para o servidor EC2
+      - name: Add my new Public Key to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: echo "${{ secrets.MY_PUBLIC_KEY }}" >> ~/.ssh/authorized_keys
+
+
       - name: Deploy to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: echo "${{ secrets.MY_PUBLIC_KEY }}" >> ~/.ssh/authorized_keys
           source: "build/*" 
           target: "/home/${{ secrets.EC2_USERNAME }}/verificacao-aws"
 
-      
       - name: Run final deploy script on EC2
         uses: appleboy/ssh-action@master
         with:
